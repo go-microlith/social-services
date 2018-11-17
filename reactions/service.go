@@ -31,7 +31,7 @@ func New(objectDeleted *strm.Stream) *Service {
 func (service *Service) Build(svc *tld.ServiceBuilder) {
 	reactions := svc.Table("reactions", stor.String("To"), stor.String("CreatedAt"), stor.DefaultChangeType)
 
-	svc.Processor("object-deleted", processors.ObjectDeleted(reactions), func(processor *strm.ProcessorBuilder) {
+	svc.Processor("object-deleted", social.ObjectDeleted(processors.PurgeReactions(reactions)), func(processor *strm.ProcessorBuilder) {
 		processor.Process(service.objectDeleted, strm.StartingPositionTrimHorizon)
 	})
 

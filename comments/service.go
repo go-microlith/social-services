@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/google/uuid"
 
 	"gopkg.in/microlith.v0/sam/tld"
@@ -14,7 +15,6 @@ import (
 	social "github.com/go-microlith/social-services"
 	"github.com/go-microlith/social-services/comments/internal/endpoints"
 	"github.com/go-microlith/social-services/comments/internal/processors"
-	"github.com/go-microlith/social-services/comments/internal/watchers"
 )
 
 type Service struct {
@@ -35,11 +35,12 @@ func (service *Service) Build(builder *tld.ServiceBuilder) {
 		on = table.GlobalIndex("on-object", stor.String("On"), stor.String("CreatedAt"), stor.ProjectionTypeAll)
 	})
 
-	builder.Watcher("watch-for-deletes", watchers.WatchForDeletes(service.objectDeleted), func(watcher *stor.WatcherBuilder) {
+	watcher := social.WatchForDeletes(service.objectDeleted, func(change events.DynamoDBStreamRecord) string { return change.Keys["ID"].String() })
+	builder.Watcher("watch-for-deletes", watcher, func(watcher *stor.WatcherBuilder) {
 		watcher.Watch(comments, strm.StartingPositionTrimHorizon)
 	})
 
-	builder.Processor("object-deleted", processors.ObjectDeleted(comments, on), func(processor *strm.ProcessorBuilder) {
+	builder.Processor("object-deleted", social.ObjectDeleted(processors.PurgeComments(comments, on)), func(processor *strm.ProcessorBuilder) {
 		processor.Process(service.objectDeleted, strm.StartingPositionTrimHorizon)
 	})
 
