@@ -30,7 +30,3 @@ func (*purgeReactions) Query(id uuid.UUID, query *stor.QueryBuilder) {
 	query.KeyCondition(expression.Key("To").Equal(expression.Value(id.String())))
 	query.Project(expression.NamesList(expression.Name("To"), expression.Name("CreatedAt")))
 }
-
-func (*purgeReactions) Key() interface{} {
-	return new(social.Reaction)
-}

@@ -32,7 +32,3 @@ func (*purgeComments) Query(id uuid.UUID, query *stor.QueryBuilder) {
 	query.KeyCondition(expression.Key("On").Equal(expression.Value(id.String())))
 	query.Project(expression.NamesList(expression.Name("ID")))
 }
-
-func (*purgeComments) Key() interface{} {
-	return new(social.Comment)
-}

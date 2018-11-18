@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
+	"log"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/google/uuid"
@@ -13,21 +14,21 @@ import (
 )
 
 type watchForDeletes struct {
-	objectDeleted *strm.Stream
-	id            func(events.DynamoDBStreamRecord) string
+	deletes *strm.Stream
+	id      func(events.DynamoDBStreamRecord) string
 }
 
-func WatchForDeletes(objectDeleted *strm.Stream, id func(events.DynamoDBStreamRecord) string) stor.Watcher {
+func WatchForDeletes(deletes *strm.Stream, id func(events.DynamoDBStreamRecord) string) stor.Watcher {
 	return &watchForDeletes{
-		objectDeleted: objectDeleted,
-		id:            id,
+		deletes: deletes,
+		id:      id,
 	}
 }
 
 func (watcher *watchForDeletes) Watch(ctx context.Context, evt events.DynamoDBEvent) error {
 	defer func() {
-		if err := watcher.objectDeleted.Flush(ctx); err != nil {
-			panic(err)
+		if err := watcher.deletes.Flush(ctx); err != nil {
+			log.Printf("could not flush stream: %s", err)
 		}
 	}()
 
@@ -40,7 +41,7 @@ func (watcher *watchForDeletes) Watch(ctx context.Context, evt events.DynamoDBEv
 
 			partitionKey := fmt.Sprintf("%X", md5.New().Sum([]byte(id.String())))
 			delete := &Delete{ID: id}
-			if err := watcher.objectDeleted.Publish(ctx, partitionKey, delete); err != nil {
+			if err := watcher.deletes.Publish(ctx, partitionKey, delete); err != nil {
 				return err
 			}
 		}

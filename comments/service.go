@@ -40,7 +40,7 @@ func (service *Service) Build(builder *tld.ServiceBuilder) {
 		watcher.Watch(comments, strm.StartingPositionTrimHorizon)
 	})
 
-	builder.Processor("object-deleted", social.ObjectDeleted(processors.PurgeComments(comments, on)), func(processor *strm.ProcessorBuilder) {
+	builder.Processor("purge-comments", social.ObjectDeleted(processors.PurgeComments(comments, on)), func(processor *strm.ProcessorBuilder) {
 		processor.Process(service.objectDeleted, strm.StartingPositionTrimHorizon)
 	})
 

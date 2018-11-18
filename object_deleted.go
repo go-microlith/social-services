@@ -17,7 +17,6 @@ type Deleter interface {
 	Source() Querier
 	Table() *stor.Table
 	Query(id uuid.UUID, query *stor.QueryBuilder)
-	Key() interface{}
 }
 
 type Delete struct {
@@ -35,7 +34,7 @@ func ObjectDeleted(deleter Deleter) strm.Processor {
 }
 
 func (processor *objectDeleted) Process(ctx context.Context, evt events.KinesisEvent) error {
-	keys := []interface{}{}
+	keys := []map[string]interface{}{}
 
 	scanner := strm.NewScanner(evt)
 	for scanner.Next() {
@@ -54,7 +53,7 @@ func (processor *objectDeleted) Process(ctx context.Context, evt events.KinesisE
 			}
 
 			for result.Next() {
-				key := processor.deleter.Key()
+				key := make(map[string]interface{})
 				if err := result.Scan(key); err != nil {
 					return err
 				}
@@ -65,8 +64,8 @@ func (processor *objectDeleted) Process(ctx context.Context, evt events.KinesisE
 				break
 			}
 			result, err = processor.deleter.Source().Query(ctx, func(query *stor.QueryBuilder) {
-				query.ExclusiveStartKey(result.LastEvaluatedKey())
 				processor.deleter.Query(delete.ID, query)
+				query.ExclusiveStartKey(result.LastEvaluatedKey())
 			})
 		}
 	}
