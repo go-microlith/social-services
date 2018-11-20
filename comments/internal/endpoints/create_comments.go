@@ -11,7 +11,7 @@ import (
 	"gopkg.in/microlith.v0/sam/tld/rest"
 	"gopkg.in/microlith.v0/sam/tld/stor"
 
-	social "github.com/go-microlith/social-services"
+	social "gopkg.in/go-microlith/social-services.v0"
 )
 
 type createComment struct {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
-	social "github.com/go-microlith/social-services"
+	social "gopkg.in/go-microlith/social-services.v0"
 	"github.com/google/uuid"
 	"gopkg.in/microlith.v0/sam/tld/rest"
 )

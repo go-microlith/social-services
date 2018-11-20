@@ -9,7 +9,7 @@ import (
 
 	"gopkg.in/microlith.v0/sam/tld/rest"
 
-	social "github.com/go-microlith/social-services"
+	social "gopkg.in/go-microlith/social-services.v0"
 )
 
 type commentOn struct {

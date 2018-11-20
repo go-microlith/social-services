@@ -12,9 +12,9 @@ import (
 	"gopkg.in/microlith.v0/sam/tld/stor"
 	"gopkg.in/microlith.v0/sam/tld/strm"
 
-	social "github.com/go-microlith/social-services"
-	"github.com/go-microlith/social-services/comments/internal/endpoints"
-	"github.com/go-microlith/social-services/comments/internal/processors"
+	social "gopkg.in/go-microlith/social-services.v0"
+	"gopkg.in/go-microlith/social-services.v0/comments/internal/endpoints"
+	"gopkg.in/go-microlith/social-services.v0/comments/internal/processors"
 )
 
 type Service struct {
