@@ -54,7 +54,7 @@ func (processor *objectDeleted) Process(ctx context.Context, evt events.KinesisE
 
 			for result.Next() {
 				key := make(map[string]interface{})
-				if err := result.Scan(key); err != nil {
+				if err := result.Scan(&key); err != nil {
 					return err
 				}
 				keys = append(keys, key)
